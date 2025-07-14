@@ -9,8 +9,10 @@ export class PatientsController {
 
   @Post()
   create(@Body() createPatientDto: CreatePatientDto) {
+    console.log('vanii')
     return this.patientsService.create(createPatientDto);
   }
+
 
   @Get()
   findAll() {

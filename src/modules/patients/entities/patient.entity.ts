@@ -11,6 +11,6 @@ export class Patient {
   name: string;
 
   @Column({ type: 'date' })
-  dateOfBirth: Date; 
+  dateOfBirth: string; 
   
 }
