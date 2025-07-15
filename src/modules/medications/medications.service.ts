@@ -32,9 +32,24 @@ export class MedicationsService {
   }
   
 
-  findAll() {
-    return `This action returns all medications`;
+  async findAll(){
+
+    try{
+      const medications=await this.medicationRepository.find()
+      return { message: 'Medications retrieved successfully', data:medications };
+
+    }catch(error){
+
+      console.error(`Failed to fetch Medications: ${error.message}`);
+      throw new BadRequestException('failed to retrieve medications');
+
+    }
+
   }
+
+  // findAll() {
+  //   return `This action returns all medications`;
+  // }
 
   findOne(id: number) {
     return `This action returns a #${id} medication`;
