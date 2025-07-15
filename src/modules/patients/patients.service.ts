@@ -16,9 +16,12 @@ export class PatientsService {
 
     try{
 
-      const patient=this.patientsRepository.create({name:createPatientDto.name,dateOfBirth:createPatientDto.dateOfBirth})
-
+      const patient= this.patientsRepository.create({name:createPatientDto.name,dateOfBirth:createPatientDto.dateOfBirth})
+      
       await this.patientsRepository.save(patient);
+
+      console.log("show patineeeet")
+      console.log(patient)
 
   
       return { message: 'added sucesfuly ', data: null };
@@ -32,9 +35,21 @@ export class PatientsService {
 
   }
 
-  findAll() {
-    return `This action returns all patients`;
+  async findAll() {
+  try {
+    console.log("insideeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee")
+    const patients = await this.patientsRepository.find();
+    return { message: 'Patients retrieved successfully', data: patients };
+  } catch (error) {
+    console.error(`Failed to fetch patients: ${error.message}`);
+    throw new BadRequestException('Failed to retrieve patients');
   }
+}
+
+
+  // findAll() {
+  //   return `This action returns all patients`;
+  // }
 
   findOne(id: number) {
     return `This action returns a #${id} patient`;

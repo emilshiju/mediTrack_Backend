@@ -6,11 +6,21 @@ import { AllExceptionsFilter } from './common/filters/http-exception.filter';
 import { TransformInterceptor } from './common/interceptors/transform.interceptor';
 
 async function bootstrap() {
+
   const app = await NestFactory.create(AppModule);
 
+    app.enableCors({
+    origin: 'http://localhost:3000',
+    methods: ['GET', 'POST', 'PUT', 'DELETE'],
+    credentials: true,
+  });
 
   
-  app.useGlobalPipes(new ValidationPipe());
+  app.useGlobalPipes(new ValidationPipe({
+    transform: true,  // ← This is crucial
+    whitelist: true,
+    // forbidNonWhitelisted: true,
+  }));
 
   // Global filters
   app.useGlobalFilters(new AllExceptionsFilter());
@@ -22,6 +32,8 @@ async function bootstrap() {
   
  
   const port = configService.get<number>('PORT') || 8000;
+
+
   
   await app.listen(port);
   
