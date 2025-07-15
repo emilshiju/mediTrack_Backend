@@ -4,6 +4,7 @@ import { AppService } from './app.service';
 import { PatientsModule } from './modules/patients/patients.module';
 import { ConfigModule } from '@nestjs/config';
 import { DatabaseModule } from './database/database.module';
+import { MedicationsModule } from './modules/medications/medications.module';
 
 @Module({
   imports: [
@@ -12,7 +13,8 @@ import { DatabaseModule } from './database/database.module';
       envFilePath: '.env', 
     }),
     DatabaseModule.forRoot(),
-    PatientsModule
+    PatientsModule,
+    MedicationsModule
   ],
   controllers: [AppController],
   providers: [AppService],

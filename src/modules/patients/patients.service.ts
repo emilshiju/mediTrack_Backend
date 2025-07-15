@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { BadRequestException, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { CreatePatientDto } from './dto/create-patient.dto';
@@ -9,7 +9,7 @@ import { Patient } from './entities/patient.entity';
 export class PatientsService {
   constructor(
     @InjectRepository(Patient)
-    private readonly patientsRepository: Repository<Patient>,
+    private  patientsRepository: Repository<Patient>,
   ){}
 
   async create(createPatientDto: CreatePatientDto) {
@@ -26,7 +26,7 @@ export class PatientsService {
 
     }catch(error){
       console.log(`Failed to create patient: ${error.message}`)
-      throw new Error(`Failed to create patient`);
+      throw new  BadRequestException(`Failed to create patient`);
     }
 
 

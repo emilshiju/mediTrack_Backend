@@ -11,6 +11,8 @@ export class Patient {
   name: string;
 
   @Column({ type: 'date' })
-  dateOfBirth: string; 
+  dateOfBirth:Date
   
+  @Column( {type: 'datetime', default: () => 'CURRENT_TIMESTAMP'})
+  createdAt: Date;
 }
