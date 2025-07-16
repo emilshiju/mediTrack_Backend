@@ -16,7 +16,7 @@ export class PatientsService {
 
     try{
 
-      const patient= this.patientsRepository.create({name:createPatientDto.name,dateOfBirth:createPatientDto.dateOfBirth})
+      const patient = this.patientsRepository.create({name:createPatientDto.name,dateOfBirth:createPatientDto.dateOfBirth})
       
       await this.patientsRepository.save(patient);
 

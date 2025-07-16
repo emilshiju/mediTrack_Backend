@@ -1,4 +1,4 @@
-import { IsNotEmpty, IsString,IsDateString ,Matches} from 'class-validator';
+import { IsNotEmpty, IsString,IsDateString ,Matches,IsDate} from 'class-validator';
 import { Transform } from 'class-transformer';
 
 export class CreatePatientDto {
@@ -7,9 +7,8 @@ export class CreatePatientDto {
   name: string;
 
   
-  @IsDateString()  
-  @IsNotEmpty()
-  //  @Matches(/^\d{4}-\d{2}-\d{2}$/)
+  @IsDate()
   @Transform(({ value }) => new Date(value)) 
   dateOfBirth:Date;
+  
 }

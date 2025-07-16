@@ -42,6 +42,8 @@ export class ValidationPipe implements PipeTransform<any> {
       whitelist: this.options?.whitelist ?? true,
       forbidNonWhitelisted: true,
     });
+    console.log("validilation     faield")
+    console.log(errors)
     
     if (errors.length > 0) {
       throw new BadRequestException('Validation failed');

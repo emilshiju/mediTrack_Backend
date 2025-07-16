@@ -1,28 +1,28 @@
-import { IsNotEmpty, IsString,IsDateString ,Matches,IsNumberString,IsInt,IsPositive} from 'class-validator';
+import { IsNotEmpty, IsString,IsDateString ,Matches,IsNumberString,IsInt,IsPositive,IsDate, IsUUID} from 'class-validator';
 import { Transform } from 'class-transformer';
 
 
 export class CreateMedicationAssignDto {
 
-  @IsNumberString()
+  @IsUUID()
   @IsNotEmpty()
   medicationId: string; 
+
+
+  @IsUUID()
+  @IsNotEmpty()
+  patientId: string; 
+
 
   @IsInt()
   @IsPositive()
   @IsNotEmpty()
   numberOfDays: number;
 
- 
-  @IsNumberString()
-  @IsNotEmpty()
-  patientId: string; 
-
   
-  @IsDateString()  
-  @IsNotEmpty()
+  @IsDate()
   @Transform(({ value }) => new Date(value)) 
-   startDate:Date;
+  startDate:Date;
 }
 
 

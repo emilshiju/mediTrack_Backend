@@ -12,23 +12,33 @@ export class MedicationAssignController {
     return this.medicationAssignService.create(createMedicationAssignDto);
   }
 
+
   @Get()
   findAll() {
     return this.medicationAssignService.findAll();
   }
 
-  @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.medicationAssignService.findOne(+id);
+  @Get()
+  findAllPatientscount(){
+    return this.medicationAssignService.findAllPatientscount()
   }
+
+
+  @Get('patient/:id')
+  findOne(@Param('id') id: string) {
+    return this.medicationAssignService.findOne(id);
+  }
+
 
   @Patch(':id')
   update(@Param('id') id: string, @Body() updateMedicationAssignDto: UpdateMedicationAssignDto) {
     return this.medicationAssignService.update(+id, updateMedicationAssignDto);
   }
 
+
   @Delete(':id')
   remove(@Param('id') id: string) {
     return this.medicationAssignService.remove(+id);
   }
+
 }
