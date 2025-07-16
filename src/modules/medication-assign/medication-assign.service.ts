@@ -5,6 +5,11 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { MedicationAssign } from './entities/medication-assign.entity';
 import { Repository } from 'typeorm';
 import { Patient } from '../patients/entities/patient.entity';
+import { processAssignmentStatus } from 'src/util/date.utils';
+import { processedAssignmentsType } from 'src/types/medication-assign.types';
+
+
+ 
 
 @Injectable()
 export class MedicationAssignService {
@@ -19,11 +24,36 @@ export class MedicationAssignService {
 
     try{
 
+
+  
+
+     const existingMedication = await this.medicationAssignRepository.find({
+            where:{patientId:createMedicationAssignDto.patientId,medicationId:createMedicationAssignDto.patientId},
+            relations: ['medication'], 
+      });
+
+
+      if(existingMedication.length>0){
+
+          const processedAssignments=processAssignmentStatus(existingMedication)
+          
+          if (processedAssignments.some(a => a.status === 'active' || a.status === 'upcoming')) {
+  
+              return {
+                  message: 'This medication has already been assigned to the user.',
+                  data: { status: false }
+              };
+          }
+
+      }
+
+
+
       const response=this.medicationAssignRepository.create(createMedicationAssignDto)
 
       await  this.medicationAssignRepository.save(response)
 
-      return { message: 'added successfully ', data: null };
+      return { message: 'added successfully ', data: {status:true} };
 
 
     }catch(error){
@@ -88,50 +118,13 @@ export class MedicationAssignService {
             relations: ['medication'], 
       });
 
-      
-      
-
-
-    const today = new Date();
-  today.setHours(0, 0, 0, 0); // Normalize to start of day
-
-  const processedAssignments = assignments.map(assignment => {
-    const startDate = new Date(assignment.startDate);
-    startDate.setHours(0, 0, 0, 0);
-    const endDate = new Date(startDate);
-    endDate.setDate(startDate.getDate() + assignment.numberOfDays);
+      const processedAssignments=processAssignmentStatus(assignments)
     
-    let status: 'upcoming' | 'active' | 'finished';
-    let remainingDays = 0;
-
-    if (today < startDate) {
-      // Treatment hasn't started yet
-      status = 'upcoming';
-      remainingDays = 0
-    } else if (today <= endDate) {
-      // Treatment is in progress
-      status = 'active';
-      remainingDays = Math.ceil((endDate.getTime() - today.getTime()) / (1000 * 60 * 60 * 24));
-    } else {
-      // Treatment has finished
-      status = 'finished';
-      remainingDays = 0;
-    }
-
-    return {
-      ...assignment,
-      status,
-      remainingDays,
-      endDate: endDate.toISOString().split('T')[0] // Add endDate for reference
-    };
-  });
-
-
 
       console.log(' i got all assignmentsssssssssssssss')
       console.log(processedAssignments)
 
-  return { message: 'Patients with count  retrieved successfully', data:processedAssignments };
+      return { message: 'Patients with count  retrieved successfully', data:processedAssignments };
 
 
 
