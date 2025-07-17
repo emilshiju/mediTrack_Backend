@@ -23,14 +23,21 @@ export class MedicationAssignService {
   async create(createMedicationAssignDto: CreateMedicationAssignDto) {
 
     try{
+   
+      console.log("list allll")
+      const all=await this.medicationAssignRepository.find({relations: ['medication']})
+      console.log(all)
+      console.log("0000")
 
-
-  
+   console.log(createMedicationAssignDto)
 
      const existingMedication = await this.medicationAssignRepository.find({
-            where:{patientId:createMedicationAssignDto.patientId,medicationId:createMedicationAssignDto.patientId},
+            where:{patientId:createMedicationAssignDto.patientId,medicationId:createMedicationAssignDto.medicationId},
             relations: ['medication'], 
       });
+
+      console.log("what the fuck")
+      console.log(existingMedication)
 
 
       if(existingMedication.length>0){
