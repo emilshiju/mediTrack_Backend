@@ -19,10 +19,31 @@ export class MedicationsService {
 
     try{
 
+      console.log("vanu",createMedicationDto)
+
+
+      const existingMedication = await this.medicationRepository.findOne({
+                where: {name:createMedicationDto.name, dosage:createMedicationDto.dosage, frequency:createMedicationDto.frequency },
+                });
+
+                console.log("first",existingMedication)
+
+
+
+      if (existingMedication) {
+          return { message: 'Medication with same name, dosage, and frequency already exists',data: {status: false},
+      };
+
+          }
+
+console.log("second")
+
+
             const medication = this.medicationRepository.create(createMedicationDto);
             await this.medicationRepository.save(medication);
             
-            return {message: 'Medication added successfully',data: null };
+            return {message: 'Medication added successfully',data: {status:true} };
+
 
 
     }catch(error){
@@ -34,6 +55,8 @@ export class MedicationsService {
     
   }
   
+
+
 
   async findAll(){
 
@@ -50,9 +73,6 @@ export class MedicationsService {
 
   }
 
-  // findAll() {
-  //   return `This action returns all medications`;
-  // }
 
 
   async findOne(id: string) {
@@ -77,9 +97,6 @@ export class MedicationsService {
 
   
 
-  // update(id: string, updateMedicationDto: UpdateMedicationDto) {
-  //   return `This action updates a #${id} medication`;
-  // }
 
   async update(id: string, updateMedicationDto: UpdateMedicationDto) {
   try {
