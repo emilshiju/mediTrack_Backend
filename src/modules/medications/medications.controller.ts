@@ -19,16 +19,16 @@ export class MedicationsController {
 
   @Get(':id')
   findOne(@Param('id') id: string) {
-    return this.medicationsService.findOne(+id);
+    return this.medicationsService.findOne(id);
   }
 
   @Patch(':id')
   update(@Param('id') id: string, @Body() updateMedicationDto: UpdateMedicationDto) {
-    return this.medicationsService.update(+id, updateMedicationDto);
+    return this.medicationsService.update(id, updateMedicationDto);
   }
 
   @Delete(':id')
   remove(@Param('id') id: string) {
-    return this.medicationsService.remove(+id);
+    return this.medicationsService.remove(id);
   }
 }

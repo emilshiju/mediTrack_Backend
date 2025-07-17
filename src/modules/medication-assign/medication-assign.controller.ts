@@ -38,7 +38,7 @@ export class MedicationAssignController {
 
   @Delete(':id')
   remove(@Param('id') id: string) {
-    return this.medicationAssignService.remove(+id);
+    return this.medicationAssignService.remove(id);
   }
 
 }

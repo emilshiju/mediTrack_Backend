@@ -142,7 +142,27 @@ export class MedicationAssignService {
     return `This action updates a #${id} medicationAssign`;
   }
 
-  remove(id: number) {
-    return `This action removes a #${id} medicationAssign`;
+  // remove(id: string) {
+  //   return `This action removes a #${id} medicationAssign`;
+  // }
+
+  async remove(id: string) {
+  try {
+    const assignment = await this.medicationAssignRepository.findOne({ where: { id } });
+
+    if (!assignment) {
+      throw new BadRequestException(`Medication assignment with ID  not found`);
+    }
+
+    await this.medicationAssignRepository.delete(id);
+
+    return { message: 'Medication assignment deleted successfully', data: null };
+  } catch (error) {
+    console.error(`Failed to delete medication assignment: ${error.message}`);
+    throw new BadRequestException('Failed to delete medication assignment');
   }
+}
+
+
+
 }
