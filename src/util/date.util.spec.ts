@@ -1,15 +1,14 @@
+import { processAssignmentStatus } from './date.utils';
+import { MedicationAssignmentsType } from 'src/types/medication-assign.types';
 
-import { processAssignmentStatus } from "./date.utils";
-import { MedicationAssignmentsType } from "src/types/medication-assign.types";
+describe('processAssignmentStatus', () => {
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
 
-
-
-describe('processAssignmentStatus',()=>{
-
-    const today=new Date()
-    today.setHours(0, 0, 0, 0);
-
-    const createAssignment = (daysFromToday: number, numberOfDays: number): MedicationAssignmentsType => {
+  const createAssignment = (
+    daysFromToday: number,
+    numberOfDays: number,
+  ): MedicationAssignmentsType => {
     const startDate = new Date(today);
     startDate.setDate(today.getDate() + daysFromToday);
 
@@ -21,20 +20,15 @@ describe('processAssignmentStatus',()=>{
     };
   };
 
-
-   it('should mark assignment as "upcoming"',()=>{
-
-    const input = [createAssignment(3, 5)]; 
+  it('should mark assignment as "upcoming"', () => {
+    const input = [createAssignment(3, 5)];
     const result = processAssignmentStatus(input);
 
     expect(result[0].status).toBe('upcoming');
     expect(result[0].remainingDays).toBe(0);
+  });
 
-   })
-
-
-
-    it('should mark assignment as "active"', () => {
+  it('should mark assignment as "active"', () => {
     const input = [createAssignment(-1, 5)]; // Started yesterday
     const result = processAssignmentStatus(input);
 
@@ -49,10 +43,4 @@ describe('processAssignmentStatus',()=>{
     expect(result[0].status).toBe('finished');
     expect(result[0].remainingDays).toBe(0);
   });
-
-
-
-
-
-
-})
+});

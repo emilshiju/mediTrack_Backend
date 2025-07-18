@@ -36,7 +36,7 @@ export const processAssignmentStatus=(assignments:MedicationAssignmentsType[]):p
       ...assignment,
       status,
       remainingDays,
-      endDate: endDate.toISOString().split('T')[0] // Add endDate for reference
+      endDate: endDate.toISOString().split('T')[0] 
     };
   });
 

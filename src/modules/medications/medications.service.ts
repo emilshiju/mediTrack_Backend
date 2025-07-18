@@ -12,148 +12,127 @@ export class MedicationsService {
     @InjectRepository(Medication)
     private medicationRepository: Repository<Medication>,
     @InjectRepository(MedicationAssign)
-    private medicationAssignRepository:Repository<MedicationAssign>
-  ){}
+    private medicationAssignRepository: Repository<MedicationAssign>,
+  ) {}
 
   async create(createMedicationDto: CreateMedicationDto) {
-
-    try{
-
-      console.log("vanu",createMedicationDto)
-
-
+    try {
       const existingMedication = await this.medicationRepository.findOne({
-                where: {name:createMedicationDto.name, dosage:createMedicationDto.dosage, frequency:createMedicationDto.frequency },
-                });
-
-                console.log("first",existingMedication)
-
-
+        where: {
+          name: createMedicationDto.name,
+          dosage: createMedicationDto.dosage,
+          frequency: createMedicationDto.frequency,
+        },
+      });
 
       if (existingMedication) {
-          return { message: 'Medication with same name, dosage, and frequency already exists',data: {status: false},
+        return {
+          message:
+            'Medication with same name, dosage, and frequency already exists',
+          data: { status: false },
+        };
+      }
+
+      const medication = this.medicationRepository.create(createMedicationDto);
+      await this.medicationRepository.save(medication);
+
+      return {
+        message: 'Medication added successfully',
+        data: { status: true },
       };
-
-          }
-
-console.log("second")
-
-
-            const medication = this.medicationRepository.create(createMedicationDto);
-            await this.medicationRepository.save(medication);
-            
-            return {message: 'Medication added successfully',data: {status:true} };
-
-
-
-    }catch(error){
-
-          console.log(`Failed to create Medication: ${error.message}`)
-          throw new  BadRequestException(`Failed to create patient`);
+    } catch (error) {
+      console.log(`Failed to create Medication: ${error.message}`);
+      throw new BadRequestException(`Failed to create patient`);
     }
-
-    
   }
-  
 
-
-
-  async findAll(){
-
-    try{
-      const medications=await this.medicationRepository.find()
-      return { message: 'Medications retrieved successfully', data:medications };
-
-    }catch(error){
-
+  async findAll() {
+    try {
+      const medications = await this.medicationRepository.find();
+      return {
+        message: 'Medications retrieved successfully',
+        data: medications,
+      };
+    } catch (error) {
       console.error(`Failed to fetch Medications: ${error.message}`);
       throw new BadRequestException('failed to retrieve medications');
-
     }
-
   }
-
-
 
   async findOne(id: string) {
-    
-  try {
-    
-    const medication = await this.medicationRepository.findOne({ where: { id } });
+    try {
+      const medication = await this.medicationRepository.findOne({
+        where: { id },
+      });
 
-    if (!medication) {
-      throw new BadRequestException(`Medication with ID  not found`);
+      if (!medication) {
+        throw new BadRequestException(`Medication with ID  not found`);
+      }
+
+      return { message: 'Medication fetched successfully', data: medication };
+    } catch (error) {
+      console.error(`Failed to fetch medication: ${error.message}`);
+      throw new BadRequestException('Failed to fetch medication');
     }
-
-    return { message: 'Medication fetched successfully', data:medication };
-
-  } catch (error) {
-    console.error(`Failed to fetch medication: ${error.message}`);
-    throw new BadRequestException('Failed to fetch medication');
   }
-  
-
-  }
-
-  
-
 
   async update(id: string, updateMedicationDto: UpdateMedicationDto) {
-  try {
-    const medication = await this.medicationRepository.findOne({ where: { id } });
+    try {
+      const medication = await this.medicationRepository.findOne({
+        where: { id },
+      });
 
-    if (!medication) {
-      throw new BadRequestException(`Medication with ID  not found`);
+      if (!medication) {
+        throw new BadRequestException(`Medication with ID  not found`);
+      }
+
+      const updatedMedication = this.medicationRepository.merge(
+        medication,
+        updateMedicationDto,
+      );
+
+      await this.medicationRepository.save(updatedMedication);
+
+      return {
+        message: 'Medication updated successfully',
+        data: updatedMedication,
+      };
+    } catch (error) {
+      console.error(`Failed to update medication: ${error.message}`);
+      throw new BadRequestException('Failed to update medication');
     }
-
-    const updatedMedication = this.medicationRepository.merge(medication, updateMedicationDto);
-
-    await this.medicationRepository.save(updatedMedication);
-
-    return { message: 'Medication updated successfully', data: updatedMedication };
-  } catch (error) {
-    console.error(`Failed to update medication: ${error.message}`);
-    throw new BadRequestException('Failed to update medication');
   }
-
-}
-
-
-
 
   async remove(id: string) {
-  try {
+    try {
+      const medication = await this.medicationRepository.findOne({
+        where: { id },
+      });
 
-    console.log("on deleteeeeeeeeeeeee")
-   
-    const medication = await this.medicationRepository.findOne({ where: { id } });
+      if (!medication) {
+        throw new BadRequestException(`Medication with ID  not found`);
+      }
 
-    if (!medication) {
-      throw new BadRequestException(`Medication with ID  not found`);
-    }
+      const isAssigned = await this.medicationAssignRepository.findOne({
+        where: { medicationId: id },
+      });
 
-    const isAssigned = await this.medicationAssignRepository.findOne({ where: { medicationId: id } });
+      if (isAssigned) {
+        return {
+          message: `Cannot delete medication. It is currently assigned to one or more patients.`,
+          data: { status: false },
+        };
+      }
 
-    if (isAssigned) {
+      await this.medicationRepository.delete(id);
+
       return {
-        message: `Cannot delete medication. It is currently assigned to one or more patients.`,
-        data:{status:false},
-
+        message: 'Medication deleted successfully',
+        data: { status: true },
       };
+    } catch (error) {
+      console.error(`Failed to delete medication: ${error.message}`);
+      throw new BadRequestException('Failed to delete medication');
     }
-
-  
-    await this.medicationRepository.delete(id);
-
-    return {
-      message: 'Medication deleted successfully',
-      data:{status:true},
-    };
-  } catch (error) {
-    console.error(`Failed to delete medication: ${error.message}`);
-    throw new BadRequestException('Failed to delete medication');
   }
-}
-
-
 }

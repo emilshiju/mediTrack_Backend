@@ -12,15 +12,11 @@ export class MedicationAssignController {
     return this.medicationAssignService.create(createMedicationAssignDto);
   }
 
-
-  @Get()
-  findAll() {
-    return this.medicationAssignService.findAll();
-  }
+ 
 
   @Get()
   findAllPatientscount(){
-    return this.medicationAssignService.findAllPatientscount()
+    return this.medicationAssignService.findAllPatients()
   }
 
 
@@ -29,11 +25,6 @@ export class MedicationAssignController {
     return this.medicationAssignService.findOne(id);
   }
 
-
-  @Patch(':id')
-  update(@Param('id') id: string, @Body() updateMedicationAssignDto: UpdateMedicationAssignDto) {
-    return this.medicationAssignService.update(+id, updateMedicationAssignDto);
-  }
 
 
   @Delete(':id')

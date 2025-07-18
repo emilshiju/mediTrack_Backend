@@ -8,9 +8,6 @@ import { Patient } from '../patients/entities/patient.entity';
 import { processAssignmentStatus } from 'src/util/date.utils';
 import { processedAssignmentsType } from 'src/types/medication-assign.types';
 
-
- 
-
 @Injectable()
 export class MedicationAssignService {
   constructor(
@@ -18,158 +15,101 @@ export class MedicationAssignService {
     private readonly medicationAssignRepository: Repository<MedicationAssign>,
     @InjectRepository(Patient)
     private patientRepository: Repository<Patient>,
-  ){}
+  ) {}
 
   async create(createMedicationAssignDto: CreateMedicationAssignDto) {
-
-    try{
-   
-      console.log("list allll")
-      const all=await this.medicationAssignRepository.find({relations: ['medication']})
-      console.log(all)
-      console.log("0000")
-
-   console.log(createMedicationAssignDto)
-
-     const existingMedication = await this.medicationAssignRepository.find({
-            where:{patientId:createMedicationAssignDto.patientId,medicationId:createMedicationAssignDto.medicationId},
-            relations: ['medication'], 
+    try {
+      const existingMedication = await this.medicationAssignRepository.find({
+        where: {
+          patientId: createMedicationAssignDto.patientId,
+          medicationId: createMedicationAssignDto.medicationId,
+        },
+        relations: ['medication'],
       });
 
-      console.log("what the fuck")
-      console.log(existingMedication)
+      if (existingMedication.length > 0) {
+        const processedAssignments =
+          processAssignmentStatus(existingMedication);
 
-
-      if(existingMedication.length>0){
-
-          const processedAssignments=processAssignmentStatus(existingMedication)
-          
-          if (processedAssignments.some(a => a.status === 'active' || a.status === 'upcoming')) {
-  
-              return {
-                  message: 'This medication has already been assigned to the user.',
-                  data: { status: false }
-              };
-          }
-
+        if (
+          processedAssignments.some(
+            (a) => a.status === 'active' || a.status === 'upcoming',
+          )
+        ) {
+          return {
+            message: 'This medication has already been assigned to the user.',
+            data: { status: false },
+          };
+        }
       }
 
+      const response = this.medicationAssignRepository.create(
+        createMedicationAssignDto,
+      );
 
+      await this.medicationAssignRepository.save(response);
 
-      const response=this.medicationAssignRepository.create(createMedicationAssignDto)
-
-      await  this.medicationAssignRepository.save(response)
-
-      return { message: 'added successfully ', data: {status:true} };
-
-
-    }catch(error){
-      console.log(`Failed to assign medicine: ${error.message}`)
-      throw new  BadRequestException(`Failed to assign medicine`);
+      return { message: 'added successfully ', data: { status: true } };
+    } catch (error) {
+      console.log(`Failed to assign medicine: ${error.message}`);
+      throw new BadRequestException(`Failed to assign medicine`);
     }
-  
   }
 
+  async findAllPatients() {
+    try {
+      const patients = await this.patientRepository.find();
 
-
-  // findAll() {
-  //   return `This action returns all medicationAssign`;
-  // }
-
-  async  findAllPatientscount (){
-
-    try{
-
-
-
-      const patients = await this.patientRepository .find()
-
-    
-      return { message: 'Patients with count  retrieved successfully', data: patients };
-
-
-    }catch(error){
-        console.log(`Failed to fetch: ${error.message}`)
-      throw new  BadRequestException(`Failed to fetch `);
+      return {
+        message: 'Patients with count  retrieved successfully',
+        data: patients,
+      };
+    } catch (error) {
+      console.log(`Failed to fetch: ${error.message}`);
+      throw new BadRequestException(`Failed to fetch `);
     }
-
   }
-
-
-  async findAll (){
-
-
-    try{
-
-      return `This action returns all medicationAssign`;
-
-
-    }catch(error){
-        console.log(`Failed to fetch: ${error.message}`)
-      throw new  BadRequestException(`Failed to fetch `);
-    }
-
-  }
-
-
-
-
 
   async findOne(id: string) {
-
-     try{
-      console.log("got id",id)
-
-       const assignments = await this.medicationAssignRepository.find({
-            where:{patientId:id},
-            relations: ['medication'], 
+    try {
+      const assignments = await this.medicationAssignRepository.find({
+        where: { patientId: id },
+        relations: ['medication'],
       });
 
-      const processedAssignments=processAssignmentStatus(assignments)
-    
+      const processedAssignments = processAssignmentStatus(assignments);
 
-      console.log(' i got all assignmentsssssssssssssss')
-      console.log(processedAssignments)
-
-      return { message: 'Patients with count  retrieved successfully', data:processedAssignments };
-
-
-
-    }catch(error){
-        console.log(`Failed to fetch: ${error.message}`)
-      throw new  BadRequestException(`Failed to fetch `);
+      return {
+        message: 'Patients with count  retrieved successfully',
+        data: processedAssignments,
+      };
+    } catch (error) {
+      console.log(`Failed to fetch: ${error.message}`);
+      throw new BadRequestException(`Failed to fetch `);
     }
-
-
   }
-
-
-
-  update(id: number, updateMedicationAssignDto: UpdateMedicationAssignDto) {
-    return `This action updates a #${id} medicationAssign`;
-  }
-
-  // remove(id: string) {
-  //   return `This action removes a #${id} medicationAssign`;
-  // }
 
   async remove(id: string) {
-  try {
-    const assignment = await this.medicationAssignRepository.findOne({ where: { id } });
+    try {
+      const assignment = await this.medicationAssignRepository.findOne({
+        where: { id },
+      });
 
-    if (!assignment) {
-      throw new BadRequestException(`Medication assignment with ID  not found`);
+      if (!assignment) {
+        throw new BadRequestException(
+          `Medication assignment with ID  not found`,
+        );
+      }
+
+      await this.medicationAssignRepository.delete(id);
+
+      return {
+        message: 'Medication assignment deleted successfully',
+        data: null,
+      };
+    } catch (error) {
+      console.error(`Failed to delete medication assignment: ${error.message}`);
+      throw new BadRequestException('Failed to delete medication assignment');
     }
-
-    await this.medicationAssignRepository.delete(id);
-
-    return { message: 'Medication assignment deleted successfully', data: null };
-  } catch (error) {
-    console.error(`Failed to delete medication assignment: ${error.message}`);
-    throw new BadRequestException('Failed to delete medication assignment');
   }
-}
-
-
-
 }
