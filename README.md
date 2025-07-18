@@ -67,29 +67,40 @@ This project uses **SQLite** as a lightweight and file-based relational database
 
 
 
+🚀 Running the Project
 
 
-## 🛠️ Getting Started
+```bash
 
-### 1. Clone the Repository
-
-
-git clone https://github.com/your-username/meditrack-backend.git
 cd mediTrack_Backend
+```
 
-Install Dependencies
+### Install Dependencies
+
+```bash
 npm install
+```
 
+### Environment Setup
 
+Create a `.env` file at the root of the project:
 
-Environment Setup
-Create a .env file at the root of the project:
+```env
 PORT=8080
+```
 
+### Run the Server
 
-Run the Server
+```bash
 npm run start:dev
+```
 
+### Running Tests
 
-Running Tests
+```bash
 npm run test
+```
+
+
+
+Access on http://localhost:8080

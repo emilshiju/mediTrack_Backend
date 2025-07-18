@@ -15,4 +15,5 @@ export class Patient {
   
   @Column( {type: 'datetime', default: () => 'CURRENT_TIMESTAMP'})
   createdAt: Date;
+  
 }

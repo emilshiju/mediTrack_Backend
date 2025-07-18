@@ -5,6 +5,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Medication } from './entities/medication.entity';
 import { Repository } from 'typeorm';
 import { MedicationAssign } from '../medication-assign/entities/medication-assign.entity';
+import { Between, Raw } from 'typeorm';
 
 @Injectable()
 export class MedicationsService {
@@ -19,16 +20,18 @@ export class MedicationsService {
     try {
       const existingMedication = await this.medicationRepository.findOne({
         where: {
-          name: createMedicationDto.name,
-          dosage: createMedicationDto.dosage,
-          frequency: createMedicationDto.frequency,
+          name: Raw((alias) => `LOWER(${alias}) = LOWER(:name)`, {
+            name: createMedicationDto.name,
+          }),
+          dosage: Raw((alias) => `LOWER(${alias}) = LOWER(:dosage)`, {
+            dosage: createMedicationDto.dosage,
+          }),
         },
       });
 
       if (existingMedication) {
         return {
-          message:
-            'Medication with same name, dosage, and frequency already exists',
+          message: 'Medication with same name, dosage  already exists',
           data: { status: false },
         };
       }
@@ -86,6 +89,24 @@ export class MedicationsService {
         throw new BadRequestException(`Medication with ID  not found`);
       }
 
+      const existingMedication = await this.medicationRepository.findOne({
+        where: {
+          name: Raw((alias) => `LOWER(${alias}) = LOWER(:name)`, {
+            name: updateMedicationDto.name,
+          }),
+          dosage: Raw((alias) => `LOWER(${alias}) = LOWER(:dosage)`, {
+            dosage: updateMedicationDto.dosage,
+          }),
+        },
+      });
+
+      if (existingMedication) {
+        return {
+          message: 'Medication with same name, dosage  already exists',
+          data: { status: false },
+        };
+      }
+
       const updatedMedication = this.medicationRepository.merge(
         medication,
         updateMedicationDto,
@@ -95,7 +116,7 @@ export class MedicationsService {
 
       return {
         message: 'Medication updated successfully',
-        data: updatedMedication,
+        data: { status: true },
       };
     } catch (error) {
       console.error(`Failed to update medication: ${error.message}`);
